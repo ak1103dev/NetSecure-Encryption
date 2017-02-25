@@ -112,14 +112,26 @@ unsigned char* charToBinary(unsigned char c) {
   return b;
 }
 
-unsigned char* strToBinary(unsigned char* str) {
-  int strlen = sizeof(str);
-  char* b = malloc(8 * strlen);
+unsigned char* strToBinary(unsigned char* str, int n) {
+  char* b = malloc(8 * n);
   int i;
-  for (i = 0; i < strlen; i++) {
+  for (i = 0; i < n; i++) {
     memcpy(b + 8 * i, charToBinary(str[i]), 8 * sizeof(char));
   }
   return b;
+}
+
+void xor(unsigned char* a, unsigned char* b, int n) {
+  unsigned char* temp = malloc(n);
+  int i;
+  for (i = 0; i < n; i++) {
+    if (a[i] == b[i]) {
+      temp[i] = '0';
+    } else {
+      temp[i] = '1';
+    }
+  }
+  memcpy(a, temp, n);
 }
 
 /*
@@ -194,9 +206,7 @@ void rotateLeft(unsigned char* bits, int len, int n) {
 
 void permute(unsigned char* bits, const int* mapping, int n) {
   unsigned char* temp = malloc(n);
-  // unsigned char* bin = strToBinary(bits);
   int i;
-  printf("perm\n");
   for (i = 0; i < n; i++) {
     temp[i] = bits[mapping[i] - 1];
   }
@@ -205,12 +215,13 @@ void permute(unsigned char* bits, const int* mapping, int n) {
 }
 
 unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end) {
-  unsigned char* text = malloc(8);
+  unsigned char* text = malloc(64);
 
   unsigned char roundKeys[16][56];
   unsigned char lkey[28], rkey[28];
-  unsigned char lblock[32], rblock[32];
+  unsigned char lblock[32], rblock[32], fblock[48];
 
+  printf("block = ");
   int i;
   for (i = start; i < end; i++) {
     text[i % 8] = buffer[i];
@@ -219,7 +230,7 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
   printf("\n");
 
   // key schedule
-  key = strToBinary(key);
+  key = strToBinary(key, 8);
   permute(key, PC1, 56);
 
   memcpy(lkey, &key[0], 28);
@@ -233,21 +244,43 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
     memcpy(roundKeys[i] + 28, rkey, 28);
 
     permute(roundKeys[i], PC2, 48);
-
-    printf("key %d = ", i + 1);
-    int j;
-    for (j = 0; j < 48; j++) {
-      printf("%c", roundKeys[i][j]);
-    }
-    printf("\n");
   }
 
   // plaintext flow
-  text = strToBinary(text);
+  text = strToBinary(text, 8);
+  printf("block = ");
+  for (i = 0; i < 64; i++) {
+    printf("%c", text[i]);
+  }
+  printf("\n");
+
   permute(text, DesInitial, 64);
+
+  printf("text = ");
+  for (i = 0; i < 64; i++) {
+    printf("%c", text[i]);
+  }
+  printf("\n");
 
   memcpy(lblock, &text[0], 32);
   memcpy(rblock, &text[32], 32);
+
+  memcpy(fblock, rblock, 32);
+  permute(fblock, DesExpansion, 48);
+
+  printf("expand = ");
+  for (i = 0; i < 48; i++) {
+    printf("%c", fblock[i]);
+  }
+  printf("\n");
+
+  xor(fblock, roundKeys[0], 48);
+
+  printf("xor = ");
+  for (i = 0; i < 48; i++) {
+    printf("%c", fblock[i]);
+  }
+  printf("\n");
 
   return text;
 }

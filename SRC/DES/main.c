@@ -9,7 +9,7 @@ static const int DesInitial[64] = {
   61, 53, 45, 37, 29, 21, 13,  5, 63, 55, 47, 39, 31, 23, 15,  7
 };
 
-char* charToBinary(char c) {
+unsigned char* charToBinary(unsigned char c) {
   char* b = malloc(8);
   int i;
   for (i = 0; i < 8; i++) {
@@ -19,7 +19,7 @@ char* charToBinary(char c) {
   return b;
 }
 
-char* strToBinary(char* str) {
+unsigned char* strToBinary(unsigned char* str) {
   int strlen = sizeof(str);
   char* b = malloc(8 * strlen);
   int i;
@@ -30,12 +30,15 @@ char* strToBinary(char* str) {
 }
 
 void permutation(unsigned char* bits, const int* mapping, int n) {
-  unsigned char temp[8];
+  unsigned char* temp = malloc(n);
+  unsigned char* bin = strToBinary(bits);
   int i;
-  /*
+  printf("perm\n");
   for (i = 0; i < n; i++) {
+    temp[i] = bin[mapping[i] - 1];
+    printf("%c", temp[i]);
   }
-  */
+  printf("\n");
 }
 
 unsigned char* des(unsigned char* buffer, int start, int end) {
@@ -78,8 +81,6 @@ int main(int argc, char **argv) {
     printf("%x ", text[i]);
   }
   */
-  printf("%d\n", DesInitial[0]);
-  printf("%d\n", DesInitial[63]);
 
   return 1;
 }

@@ -43,13 +43,19 @@ void permutation(unsigned char* bits, const int* mapping, int n) {
 
 unsigned char* des(unsigned char* buffer, int start, int end) {
   unsigned char* text = malloc(8);
+  unsigned char lblock[4], rblock[4];
   int i;
   for (i = start; i < end; i++) {
     text[i % 8] = buffer[i];
     printf("%x ", text[i % 8]);
   }
   printf("\n");
+
   permutation(text, DesInitial, 64);
+
+  memcpy(lblock, &text[0], 4);
+  memcpy(rblock, &text[4], 4);
+
   return text;
 }
 

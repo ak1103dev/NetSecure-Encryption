@@ -219,10 +219,12 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
 
   unsigned char roundKeys[16][56];
   unsigned char lkey[28], rkey[28];
-  unsigned char lblock[32], rblock[32], fblock[48];
+  unsigned char lblock[32], rblock[32], fblock[48], sblock;
+
+  int i, j, k;
+  int row, col;
 
   printf("block = ");
-  int i;
   for (i = start; i < end; i++) {
     text[i % 8] = buffer[i];
     printf("%x ", text[i % 8]);
@@ -248,19 +250,7 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
 
   // plaintext flow
   text = strToBinary(text, 8);
-  printf("block = ");
-  for (i = 0; i < 64; i++) {
-    printf("%c", text[i]);
-  }
-  printf("\n");
-
   permute(text, DesInitial, 64);
-
-  printf("text = ");
-  for (i = 0; i < 64; i++) {
-    printf("%c", text[i]);
-  }
-  printf("\n");
 
   memcpy(lblock, &text[0], 32);
   memcpy(rblock, &text[32], 32);
@@ -268,16 +258,22 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
   memcpy(fblock, rblock, 32);
   permute(fblock, DesExpansion, 48);
 
-  printf("expand = ");
-  for (i = 0; i < 48; i++) {
-    printf("%c", fblock[i]);
-  }
-  printf("\n");
-
   xor(fblock, roundKeys[0], 48);
 
-  printf("xor = ");
-  for (i = 0; i < 48; i++) {
+  for (j = 0; j < 8; j++) {
+    row = 2 * (fblock[6*j] - '0') + (fblock[6*j + 5] - '0');
+    col = 8 * (fblock[6*j + 1] - '0') + 4 * (fblock[6*j + 2] - '0') + 2 * (fblock[6*j + 3] - '0') + (fblock[6*j + 4] - '0');
+    sblock = (unsigned char)DesSbox[j][row][col];
+    unsigned char* sBin = charToBinary(sblock);
+    for (k = 0; k < 4; k++) {
+      fblock[4*j + k] = sBin[k + 4];
+    }
+  }
+
+  permute(fblock, DesPbox, 32);
+
+  printf("f = ");
+  for (i = 0; i < 32; i++) {
     printf("%c", fblock[i]);
   }
   printf("\n");

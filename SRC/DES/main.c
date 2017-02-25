@@ -255,28 +255,29 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
   memcpy(lblock, &text[0], 32);
   memcpy(rblock, &text[32], 32);
 
-  memcpy(fblock, rblock, 32);
-  permute(fblock, DesExpansion, 48);
+  for (i = 0; i < 16; i++) {
+    memcpy(fblock, rblock, 32);
+    permute(fblock, DesExpansion, 48);
 
-  xor(fblock, roundKeys[0], 48);
+    xor(fblock, roundKeys[i], 48);
 
-  for (j = 0; j < 8; j++) {
-    row = 2 * (fblock[6*j] - '0') + (fblock[6*j + 5] - '0');
-    col = 8 * (fblock[6*j + 1] - '0') + 4 * (fblock[6*j + 2] - '0') + 2 * (fblock[6*j + 3] - '0') + (fblock[6*j + 4] - '0');
-    sblock = (unsigned char)DesSbox[j][row][col];
-    unsigned char* sBin = charToBinary(sblock);
-    for (k = 0; k < 4; k++) {
-      fblock[4*j + k] = sBin[k + 4];
+    for (j = 0; j < 8; j++) {
+      row = 2 * (fblock[6*j] - '0') + (fblock[6*j + 5] - '0');
+      col = 8 * (fblock[6*j + 1] - '0') + 4 * (fblock[6*j + 2] - '0') + 2 * (fblock[6*j + 3] - '0') + (fblock[6*j + 4] - '0');
+      sblock = (unsigned char)DesSbox[j][row][col];
+      unsigned char* sBin = charToBinary(sblock);
+      for (k = 0; k < 4; k++) {
+        fblock[4*j + k] = sBin[k + 4];
+      }
     }
-  }
 
-  permute(fblock, DesPbox, 32);
+    permute(fblock, DesPbox, 32);
 
-  printf("f = ");
-  for (i = 0; i < 32; i++) {
-    printf("%c", fblock[i]);
+    xor(fblock, lblock, 32);
+
+    memcpy(lblock, rblock, 32);
+    memcpy(rblock, fblock, 32);
   }
-  printf("\n");
 
   return text;
 }

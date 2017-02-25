@@ -1,14 +1,52 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+static const int DesInitial[64] = {
+  58, 50, 42, 34, 26, 18, 10,  2, 60, 52, 44, 36, 28, 20, 12,  4,
+  62, 54, 46, 38, 30, 22, 14,  6, 64, 56, 48, 40, 32, 24, 16,  8,
+  57, 49, 41, 33, 25, 17,  9,  1, 59, 51, 43, 35, 27, 19, 11,  3,
+  61, 53, 45, 37, 29, 21, 13,  5, 63, 55, 47, 39, 31, 23, 15,  7
+};
+
+char* charToBinary(char c) {
+  char* b = malloc(8);
+  int i;
+  for (i = 0; i < 8; i++) {
+    b[7-i] = c % 2 + '0';
+    c /= 2;
+  }
+  return b;
+}
+
+char* strToBinary(char* str) {
+  int strlen = sizeof(str);
+  char* b = malloc(8 * strlen);
+  int i;
+  for (i = 0; i < strlen; i++) {
+    memcpy(b + 8 * i, charToBinary(str[i]), 8 * sizeof(char));
+  }
+  return b;
+}
+
+void permutation(unsigned char* bits, const int* mapping, int n) {
+  unsigned char temp[8];
+  int i;
+  /*
+  for (i = 0; i < n; i++) {
+  }
+  */
+}
 
 unsigned char* des(unsigned char* buffer, int start, int end) {
-  unsigned char text[8];
+  unsigned char* text = malloc(8);
   int i;
   for (i = start; i < end; i++) {
     text[i % 8] = buffer[i];
     printf("%x ", text[i % 8]);
   }
   printf("\n");
+  permutation(text, DesInitial, 64);
   return text;
 }
 
@@ -34,10 +72,14 @@ int main(int argc, char **argv) {
   unsigned char* text = malloc(8);
   text = des(buffer, 0, 8);
 
+  /*
   int i;
   for (i = 0; i < 8; i++) {
     printf("%x ", text[i]);
   }
+  */
+  printf("%d\n", DesInitial[0]);
+  printf("%d\n", DesInitial[63]);
 
   return 1;
 }

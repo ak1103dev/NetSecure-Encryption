@@ -102,6 +102,14 @@ static const int DesFinal[64] = {
   34,  2, 42, 10, 50, 18, 58, 26, 33,  1, 41,  9, 49, 17, 57, 25
 };
 
+void show(unsigned char* str, int n) {
+  int i;
+  for (i = 0; i < n; i++) {
+    printf("%c", str[i]);
+  }
+  printf("\n");
+}
+
 unsigned char* charToBinary(unsigned char c) {
   char* b = malloc(8);
   int i;
@@ -121,7 +129,7 @@ unsigned char* strToBinary(unsigned char* str, int n) {
   return b;
 }
 
-void xor(unsigned char* a, unsigned char* b, int n) {
+void xor(unsigned char* result, unsigned char* a, unsigned char* b, int n) {
   unsigned char* temp = malloc(n);
   int i;
   for (i = 0; i < n; i++) {
@@ -131,26 +139,23 @@ void xor(unsigned char* a, unsigned char* b, int n) {
       temp[i] = '1';
     }
   }
-  memcpy(a, temp, n);
+  memcpy(result, temp, n);
 }
 
-/*
-unsigned char* binaryToStr(unsigned char* bin) {
-  int len = strlen(bin) / 8;
-  unsigned char* temp = malloc(len);
+unsigned char* binaryToStr(unsigned char* bin, int n) {
+  unsigned char* temp = malloc(n);
   int i;
-  for (i = 0; i < len; i++) {
+  for (i = 0; i < n; i++) {
     int j;
     unsigned char byte[8];
-    for (j = 8*i; j < 8*i + 7; j++) {
+    for (j = 0; j < 8*i + 8; j++) {
       byte[j % 8] = bin[j];
     }
     temp[i] = strtol(byte, 0, 2);
-    printf("bin to str = %x\n", temp[i]);
+//    printf("bin to str = %x\n", temp[i]);
   }
   return temp;
 }
-*/
 
 unsigned char hexToDec(char x) {
   switch (x) {
@@ -219,7 +224,9 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
 
   unsigned char roundKeys[16][56];
   unsigned char lkey[28], rkey[28];
-  unsigned char lblock[32], rblock[32], fblock[48], sblock;
+  unsigned char lblock[32], rblock[32],
+                fblock[48], xblock[48],
+                sblock;
 
   int i, j, k;
   int row, col;
@@ -259,11 +266,11 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
     memcpy(fblock, rblock, 32);
     permute(fblock, DesExpansion, 48);
 
-    xor(fblock, roundKeys[i], 48);
+    xor(xblock, fblock, roundKeys[i], 48);
 
     for (j = 0; j < 8; j++) {
-      row = 2 * (fblock[6*j] - '0') + (fblock[6*j + 5] - '0');
-      col = 8 * (fblock[6*j + 1] - '0') + 4 * (fblock[6*j + 2] - '0') + 2 * (fblock[6*j + 3] - '0') + (fblock[6*j + 4] - '0');
+      row = 2 * (xblock[6*j] - '0') + (xblock[6*j + 5] - '0');
+      col = 8 * (xblock[6*j + 1] - '0') + 4 * (xblock[6*j + 2] - '0') + 2 * (xblock[6*j + 3] - '0') + (xblock[6*j + 4] - '0');
       sblock = (unsigned char)DesSbox[j][row][col];
       unsigned char* sBin = charToBinary(sblock);
       for (k = 0; k < 4; k++) {
@@ -273,13 +280,23 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
 
     permute(fblock, DesPbox, 32);
 
-    xor(fblock, lblock, 32);
+    xor(fblock, fblock, lblock, 32);
 
     memcpy(lblock, rblock, 32);
     memcpy(rblock, fblock, 32);
   }
 
-  return text;
+  memcpy(text, rblock, 32);
+  memcpy(text + 32, lblock, 32);
+
+  permute(text, DesFinal, 64);
+
+  printf("result = ");
+  show(text, 64);
+
+  return binaryToStr(text, 8);
+
+  // return text;
 }
 
 int main(int argc, char **argv) {
@@ -308,12 +325,12 @@ int main(int argc, char **argv) {
   printf("key = %s\n", key);
   text = des(key, buffer, 0, 8);
 
-  /*
+  printf("cipher = ");
   int i;
   for (i = 0; i < 8; i++) {
     printf("%x ", text[i]);
   }
-  */
+  printf("\n");
 
   return 1;
 }

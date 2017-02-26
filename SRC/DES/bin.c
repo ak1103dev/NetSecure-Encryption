@@ -58,6 +58,23 @@ unsigned char* hexToStr(char* hex) {
   return str;
 }
 
+/*
+unsigned char* binaryToStr(unsigned char* bin, int n) {
+  unsigned char* temp = malloc(n);
+  int i;
+  for (i = 0; i < n; i++) {
+    int j;
+    unsigned char byte[8];
+    for (j = 8*i; j < 8*i + 7; j++) {
+      byte[j % 8] = bin[j];
+    }
+    temp[i] = strtol(byte, 0, 2);
+//    printf("bin to str = %x\n", temp[i]);
+  }
+  return temp;
+}
+*/
+
 void main()
 {
   char hex[16] = "1234567887654321";

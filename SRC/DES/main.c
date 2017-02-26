@@ -302,7 +302,7 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
 }
 
 int main(int argc, char **argv) {
-  if (argc < 3) {
+  if (argc < 4) {
     printf("error\n");
     return 0;
   }
@@ -318,8 +318,8 @@ int main(int argc, char **argv) {
   filesize = ftell(ptr);
   fseek(ptr, 0, SEEK_SET);
 
-  // FILE *write_ptr;
-  // write_ptr = fopen("encrypt.des","wb");
+  FILE *write_ptr;
+  write_ptr = fopen(argv[3],"wb");
 
   // printf("cipher = \n");
   int num = filesize / 8;
@@ -342,16 +342,18 @@ int main(int argc, char **argv) {
 
     text = des(key, buffer, 0, 8);
 
+    /*
     int j;
     for (j = 0; j < 8; j++) {
       printf("%c", text[j]);
     }
+    */
 
-    free(text);
     // printf("\n");
-    // fwrite(text, sizeof(text), 1, write_ptr);
+    fwrite(text, sizeof(text), 1, write_ptr);
+    free(text);
   }
-  // fclose(write_ptr);
+  fclose(write_ptr);
 
   return 1;
 }

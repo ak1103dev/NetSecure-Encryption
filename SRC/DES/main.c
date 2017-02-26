@@ -152,7 +152,6 @@ unsigned char* binaryToStr(unsigned char* bin, int n) {
       byte[j % 8] = bin[j];
     }
     temp[i] = strtol(byte, 0, 2);
-//    printf("bin to str = %x\n", temp[i]);
   }
   return temp;
 }
@@ -231,12 +230,12 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
   int i, j, k;
   int row, col;
 
-  printf("block = ");
+  // printf("block = ");
   for (i = start; i < end; i++) {
     text[i % 8] = buffer[i];
-    printf("%x ", text[i % 8]);
+    // printf("%x ", text[i % 8]);
   }
-  printf("\n");
+  // printf("\n");
 
   // key schedule
   key = strToBinary(key, 8);
@@ -291,12 +290,7 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
 
   permute(text, DesFinal, 64);
 
-  printf("result = ");
-  show(text, 64);
-
   return binaryToStr(text, 8);
-
-  // return text;
 }
 
 int main(int argc, char **argv) {
@@ -316,21 +310,22 @@ int main(int argc, char **argv) {
   filesize = ftell(ptr);
   fseek(ptr, 0, SEEK_SET);
 
-  unsigned char buffer[filesize];
+  unsigned char buffer[8 * 8];
 
   fread(buffer, sizeof(buffer), 1, ptr);
 
   unsigned char* text = malloc(8);
 
-  printf("key = %s\n", key);
   text = des(key, buffer, 0, 8);
 
+  /*
   printf("cipher = ");
   int i;
   for (i = 0; i < 8; i++) {
     printf("%x ", text[i]);
   }
   printf("\n");
+  */
 
   FILE *write_ptr;
 

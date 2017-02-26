@@ -124,7 +124,9 @@ unsigned char* strToBinary(unsigned char* str, int n) {
   char* b = malloc(8 * n);
   int i;
   for (i = 0; i < n; i++) {
-    memcpy(b + 8 * i, charToBinary(str[i]), 8 * sizeof(char));
+    char* x = charToBinary(str[i]);
+    memcpy(b + 8 * i, x, 8 * sizeof(char));
+    free(x);
   }
   return b;
 }
@@ -140,6 +142,7 @@ void xor(unsigned char* result, unsigned char* a, unsigned char* b, int n) {
     }
   }
   memcpy(result, temp, n);
+  free(temp);
 }
 
 unsigned char* binaryToStr(unsigned char* bin, int n) {
@@ -206,6 +209,7 @@ void rotateLeft(unsigned char* bits, int len, int n) {
     temp[len - 1] = bits[1];
   }
   memcpy(bits, temp, len);
+  free(temp);
 }
 
 void permute(unsigned char* bits, const int* mapping, int n) {
@@ -215,6 +219,7 @@ void permute(unsigned char* bits, const int* mapping, int n) {
     temp[i] = bits[mapping[i] - 1];
   }
   memcpy(bits, temp, n);
+  free(temp);
   return;
 }
 
@@ -243,6 +248,8 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
 
   memcpy(lkey, &key[0], 28);
   memcpy(rkey, &key[28], 28);
+
+  free(key);
 
   for (i = 0; i < 16; i++) {
     rotateLeft(lkey, 28, DesRotations[i]);
@@ -275,6 +282,7 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
       for (k = 0; k < 4; k++) {
         fblock[4*j + k] = sBin[k + 4];
       }
+      free(sBin);
     }
 
     permute(fblock, DesPbox, 32);
@@ -310,8 +318,8 @@ int main(int argc, char **argv) {
   filesize = ftell(ptr);
   fseek(ptr, 0, SEEK_SET);
 
-  FILE *write_ptr;
-  write_ptr = fopen("encrypt.des","wb");
+  // FILE *write_ptr;
+  // write_ptr = fopen("encrypt.des","wb");
 
   // printf("cipher = \n");
   int num = filesize / 8;
@@ -334,16 +342,16 @@ int main(int argc, char **argv) {
 
     text = des(key, buffer, 0, 8);
 
-    /*
     int j;
     for (j = 0; j < 8; j++) {
-      printf("%x ", text[j]);
+      printf("%c", text[j]);
     }
-    printf("\n");
-    */
-    fwrite(text, sizeof(text), 1, write_ptr);
+
+    free(text);
+    // printf("\n");
+    // fwrite(text, sizeof(text), 1, write_ptr);
   }
-  fclose(write_ptr);
+  // fclose(write_ptr);
 
   return 1;
 }

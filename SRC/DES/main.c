@@ -310,28 +310,40 @@ int main(int argc, char **argv) {
   filesize = ftell(ptr);
   fseek(ptr, 0, SEEK_SET);
 
-  unsigned char buffer[8 * 8];
-
-  fread(buffer, sizeof(buffer), 1, ptr);
-
-  unsigned char* text = malloc(8);
-
-  text = des(key, buffer, 0, 8);
-
-  /*
-  printf("cipher = ");
-  int i;
-  for (i = 0; i < 8; i++) {
-    printf("%x ", text[i]);
-  }
-  printf("\n");
-  */
-
   FILE *write_ptr;
-
   write_ptr = fopen("encrypt.des","wb");
 
-  fwrite(text, sizeof(text), 1, write_ptr);
+  // printf("cipher = \n");
+  int num = filesize / 8;
+  int reminder = filesize % 8;
+  if (reminder != 0) num += 1;
+  int i;
+  for (i = 0; i < num; i++) {
+    unsigned char buffer[8];
+
+    fread(buffer, sizeof(buffer), 1, ptr);
+
+    if (i == num - 1 && reminder != 0) {
+      int j;
+      for (j = reminder; j < 8; j++) {
+        buffer[j] = 0;
+      }
+    }
+
+    unsigned char* text = malloc(8);
+
+    text = des(key, buffer, 0, 8);
+
+    /*
+    int j;
+    for (j = 0; j < 8; j++) {
+      printf("%x ", text[j]);
+    }
+    printf("\n");
+    */
+    fwrite(text, sizeof(text), 1, write_ptr);
+  }
+  fclose(write_ptr);
 
   return 1;
 }

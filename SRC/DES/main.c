@@ -332,6 +332,12 @@ int main(int argc, char **argv) {
   }
   printf("\n");
 
+  FILE *write_ptr;
+
+  write_ptr = fopen("encrypt.des","wb");
+
+  fwrite(text, sizeof(text), 1, write_ptr);
+
   return 1;
 }
 

@@ -223,26 +223,12 @@ void permute(unsigned char* bits, const int* mapping, int n) {
   return;
 }
 
-unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end) {
-  unsigned char* text = malloc(64);
+static unsigned char roundKeys[16][56];
 
-  unsigned char roundKeys[16][56];
+void keySchedule(unsigned char* key) {
   unsigned char lkey[28], rkey[28];
-  unsigned char lblock[32], rblock[32],
-                fblock[48], xblock[48],
-                sblock;
+  int i;
 
-  int i, j, k;
-  int row, col;
-
-  // printf("block = ");
-  for (i = start; i < end; i++) {
-    text[i % 8] = buffer[i];
-    // printf("%x ", text[i % 8]);
-  }
-  // printf("\n");
-
-  // key schedule
   key = strToBinary(key, 8);
   permute(key, PC1, 56);
 
@@ -259,6 +245,20 @@ unsigned char* des(unsigned char* key, unsigned char* buffer, int start, int end
     memcpy(roundKeys[i] + 28, rkey, 28);
 
     permute(roundKeys[i], PC2, 48);
+  }
+}
+
+unsigned char* des(unsigned char* buffer, int start, int end) {
+  unsigned char* text = malloc(64);
+  unsigned char lblock[32], rblock[32],
+                fblock[48], xblock[48],
+                sblock;
+
+  int i, j, k;
+  int row, col;
+
+  for (i = start; i < end; i++) {
+    text[i % 8] = buffer[i];
   }
 
   // plaintext flow
@@ -306,14 +306,19 @@ int main(int argc, char **argv) {
     printf("error\n");
     return 0;
   }
+
+  // get key
   unsigned char* keyHex = argv[2];
   unsigned char* key = hexToStr(keyHex);
+  keySchedule(key);
+
   FILE *ptr;
   int filesize;
   char* filename = argv[1];
 
   ptr = fopen(filename, "rb");
 
+  // find file size
   fseek(ptr, 0, SEEK_END);
   filesize = ftell(ptr);
   fseek(ptr, 0, SEEK_SET);
@@ -321,7 +326,6 @@ int main(int argc, char **argv) {
   FILE *write_ptr;
   write_ptr = fopen(argv[3],"wb");
 
-  // printf("cipher = \n");
   int num = filesize / 8;
   int reminder = filesize % 8;
   if (reminder != 0) num += 1;
@@ -340,16 +344,8 @@ int main(int argc, char **argv) {
 
     unsigned char* text = malloc(8);
 
-    text = des(key, buffer, 0, 8);
+    text = des(buffer, 0, 8);
 
-    /*
-    int j;
-    for (j = 0; j < 8; j++) {
-      printf("%c", text[j]);
-    }
-    */
-
-    // printf("\n");
     fwrite(text, sizeof(text), 1, write_ptr);
     free(text);
   }

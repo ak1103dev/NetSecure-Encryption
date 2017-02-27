@@ -4,3 +4,9 @@
 ***/*.out
 ***/rom.hex
 ***/*.map
+
+An-Overview-Cryptography.pdf
+Cryptography and Network Security Principles and Practices, 4th Ed - William Stallings.pdf
+
+*.aes
+*.des

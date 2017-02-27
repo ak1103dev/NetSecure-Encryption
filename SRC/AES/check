@@ -1,0 +1,30 @@
+plaintext =
+6b c1 be e2 2e 40 9f 96 e9 3d 7e 11 73 93 17 2a
+ae 2d 8a 57 1e 03 ac 9c 9e b7 6f ac 45 af 8e 51
+30 c8 1c 46 a3 5c e4 11 e5 fb c1 19 1a 0a 52 ef
+f6 9f 24 45 df 4f 9b 17 ad 2b 41 7b e6 6c 37 10
+
+key = 2b7e151628aed2a6abf7158809cf4f3c
+
+ciphertext =
+75a5605e66e6edad1f2c7593c910844f
+ba1be547ea2d3fb02b3178a41672bfa5
+03e6a9df68bd45b358372e5f0d380b23
+43da21c3a4f2cbd63d7e2e5da1dec586
+
+http://www.codemiles.com/java/advanced-encryption-standard-aes-example-cipher-step1-t182.html
+
+plaintext =
+63 6D 73 65
+6F 69 63 6D
+64 6C 6F 69
+65 65 64 6C
+
+key =
+6A 6D 73 6A
+75 65 74 75
+73 6A 6D 73
+74 75 65 74
+
+ciphertext =
+46f8762f7587707eae54f2d3eec58161

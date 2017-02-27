@@ -1,4 +1,4 @@
-### Tiny AES128 in C
+### Tiny AES128 in C (ref: https://github.com/kokke/tiny-AES128-C)
 
 This is a small and portable implementation of the AES128 ECB and CBC encryption algorithms written in C.
 
@@ -17,7 +17,7 @@ There is no built-in error checking or protection from out-of-bounds memory acce
 
 The module uses around 200 bytes of RAM and 2.5K ROM when compiled for ARM (~2K for Thumb but YMMV).
 
-It is one of the smallest implementation in C I've seen yet, but do contact me if you know of something smaller (or have improvements to the code here). 
+It is one of the smallest implementation in C I've seen yet, but do contact me if you know of something smaller (or have improvements to the code here).
 
 I've successfully used the code on 64bit x86, 32bit ARM and 8 bit AVR platforms.
 

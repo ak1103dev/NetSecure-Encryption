@@ -1,6 +1,6 @@
 # NetSecure-Encryption
 
-Learning encryption algorithm
+Learning encryption algorithm in Computer System & Network Security Course
 
 ## How to run
 

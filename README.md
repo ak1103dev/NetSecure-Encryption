@@ -1,5 +1,7 @@
 # NetSecure-Encryption
 
+Learning encryption algorithm
+
 ## How to run
 
 DES
